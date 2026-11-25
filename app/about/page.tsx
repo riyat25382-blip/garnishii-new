@@ -1,0 +1,8 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+export const metadata: Metadata = { title: "About Garnishii" };
+
+export default function AboutPage() {
+  return <div className="page-shell about-page"><section className="page-intro"><span className="overline">A note from us</span><h1>Careers are a journey,<br /><em>not a personality test.</em></h1><p>Garnishii is a friendly place to get curious about work, without needing to have your whole life mapped out.</p></section><div className="about-story"><div className="about-art"><span>✳</span><strong>there’s room<br />to figure it out</strong></div><div><span className="overline">Why we’re here</span><h2>Make the big world of work feel a little smaller.</h2><p>Career choices can feel like they arrive with too much pressure and too little context. Garnishii gives you a place to explore roles, the skills behind them and small ways to try things out.</p><p>We believe there isn’t one perfect path, and your first idea doesn’t have to be your forever idea. Take what’s useful, ask questions and follow your own curiosity.</p><Link className="button button--dark" href="/explore">Start exploring</Link></div></div><div className="about-principles">{[{ n: "01", title: "Curiosity over certainty", text: "You can explore without needing to commit to a label." }, { n: "02", title: "Honest context", text: "Profession entries are a discovery taxonomy. Qualifications, hiring details and pay are not stated as facts without verification." }, { n: "03", title: "Small steps count", text: "A question, a project, a conversation: all are good beginnings." }].map((item) => <article key={item.n}><span>{item.n}</span><h3>{item.title}</h3><p>{item.text}</p></article>)}</div></div>;
+}

@@ -1,0 +1,258 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 1. Industries (e.g., Technology, Healthcare, Finance)
+model Industry {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categories  CareerCategory[]
+}
+
+// 2. Career Categories within an Industry (e.g., Software Development, Data Science)
+model CareerCategory {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  industryId  String
+  industry    Industry @relation(fields: [industryId], references: [id])
+  description String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  professions Profession[]
+
+  @@index([industryId])
+}
+
+// 3. Individual Job Roles (The Core Unit)
+model Profession {
+  id                   String   @id @default(uuid())
+  name                 String   // e.g., "Frontend Developer"
+  slug                 String   @unique
+  categoryId           String
+  category             CareerCategory @relation(fields: [categoryId], references: [id])
+
+  // Overview
+  shortDescription     String?  // Brief summary
+  detailedDescription  String?  // Detailed "What they do"
+  dailyResponsibilities String?  // "Daily responsibilities"
+  typicalProjects      String?  // "Typical projects"
+  industriesHiring     String?  // "Industries that hire for this role"
+  companyTypes         String?  // "Types of companies"
+
+  // Metadata
+  order                Int      @default(0)
+  isActive             Boolean  @default(true)
+  lastUpdated          DateTime @default(now())
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Relations
+  skills               Skill[]
+  compensation         Compensation[]
+  education            Education[]
+  tools                Tool[]
+  roadmapSteps         RoadmapStep[]
+  suggestedProjects    ProjectSuggestion[]
+  marketInfo           MarketInfo?
+  faqs                 FAQ[]
+  references           Reference[]
+
+  @@index([categoryId])
+}
+
+// 4. Skills Breakdown
+model Skill {
+  id              String   @id @default(uuid())
+  professionId    String
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  name            String
+  type            String   // "must-have", "additional", "soft", "industry-specific", "tools", "advanced"
+  description     String?
+  requirementWhy  String?  // "Why it is required"
+  professionalUse String?  // "How it is used professionally"
+  level           String   // "beginner", "intermediate", "advanced"
+  isEssential     Boolean  @default(false) // "Essential for beginners"
+  learningDuration String? // "How long it may take to learn"
+  learningSource   String? // "Where students can learn it"
+  isFree           Boolean @default(true)
+  resourceLink     String? // Official link
+
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([professionId])
+}
+
+// 5. Compensation (Stipend & Salary)
+model Compensation {
+  id               String   @id @default(uuid())
+  professionId     String
+  profession       Profession @relation(fields: [professionId], references: [id])
+
+  type             String   // "internship", "salary"
+  experienceLevel  String   // "internship-beginner", "internship-intermediate", "internship-advanced", "fresher", "junior", "mid", "experienced", "senior"
+
+  amountMin        Int      // In INR
+  amountMax        Int?     // In INR
+  amountMedian     Int?     // In INR
+  period           String   // "monthly", "annual"
+
+  // Details
+  isRemote         Boolean?
+  location         String?  // City or Region
+  companyType      String?  // "Startup", "Established", "MNC", "Govt"
+  isApprenticeship Boolean @default(false) // Registered apprenticeship vs regular
+
+  // Salary specific
+  isCTC            Boolean @default(true)
+  grossMonthly     Int?
+  takeHomeMonthly  Int?
+
+  // Verification
+  source           String?
+  verifiedDate     DateTime?
+  notes            String?
+
+  currency         String   @default("INR")
+  createdAt        DateTime @default(now())
+
+  @@index([professionId])
+}
+
+// 6. Educational Qualifications
+model Education {
+  id              String   @id @default(uuid())
+  professionId    String
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  title           String   // e.g., "B.Tech in Computer Science"
+  level           String   // "school-stream", "undergraduate", "postgraduate", "certification"
+  isMandatory     Boolean  @default(false)
+  description     String?
+  alternatives    String?  // Alternative entry routes
+
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([professionId])
+}
+
+// 7. Tools and Technologies
+model Tool {
+  id              String   @id @default(uuid())
+  professionId    String
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  name            String
+  purpose         String?
+  professionalUse String?
+  level           String   // "beginner", "advanced"
+  isFree          Boolean  @default(true)
+  learningLink    String?
+
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([professionId])
+}
+
+// 8. Learning Roadmap
+model RoadmapStep {
+  id              String   @id @default(uuid())
+  professionId    String
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  phase           String   // "beginner", "intermediate", "advanced", "job-ready"
+  title           String
+  description     String?
+  estimatedDuration String?
+
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([professionId])
+}
+
+// 9. Projects and Practical Experience
+model ProjectSuggestion {
+  id              String   @id @default(uuid())
+  professionId    String
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  title           String
+  level           String   // "beginner", "intermediate", "advanced"
+  description     String?
+  skillsDemonstrated String?
+
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([professionId])
+}
+
+// 10. Job Market Information
+model MarketInfo {
+  id              String   @id @default(uuid())
+  professionId    String   @unique
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  demandIndicator  String?
+  majorHiringHubs  String?  // Cities
+  entryLevelEase   String?  // Scale or description
+  remoteWorkPolicy String?
+  futureOutlook    String?
+
+  source           String?
+  sourceDate       DateTime?
+
+  updatedAt        DateTime @updatedAt
+}
+
+// 11. Frequently Asked Questions
+model FAQ {
+  id              String   @id @default(uuid())
+  professionId    String
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  question        String
+  answer          String
+
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([professionId])
+}
+
+// 12. References/Sources
+model Reference {
+  id              String   @id @default(uuid())
+  professionId    String
+  profession      Profession @relation(fields: [professionId], references: [id])
+
+  title           String
+  url             String?
+  type            String   // "government", "industry-report", "university", "other"
+
+  createdAt       DateTime @default(now())
+
+  @@index([professionId])
+}
