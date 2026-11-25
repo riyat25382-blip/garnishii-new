@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { careerTaxonomy } from "@/data/career-taxonomy";
@@ -18,11 +17,7 @@ export async function generateMetadata({ params }: PageProps<"/industries/[slug]
   return field ? { title: field.name, description: `${field.name} professions in ${industry?.name}.` } : {};
 }
 
-export default function CareerFieldPage({ params }: PageProps<"/industries/[slug]/[fieldSlug]">) {
-  return <Suspense fallback={<div className="page-shell empty-state">Loading career field…</div>}><CareerFieldPageContent params={params} /></Suspense>;
-}
-
-async function CareerFieldPageContent({ params }: Pick<PageProps<"/industries/[slug]/[fieldSlug]">, "params">) {
+export default async function CareerFieldPage({ params }: PageProps<"/industries/[slug]/[fieldSlug]">) {
   const { slug, fieldSlug } = await params;
   const industry = careerTaxonomy.find((item) => item.slug === slug);
   const field = industry?.fields.find((item) => slugify(item.name) === fieldSlug);

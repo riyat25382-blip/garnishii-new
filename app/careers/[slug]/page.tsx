@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CareerCard from "@/components/CareerCard";
@@ -37,11 +36,7 @@ export async function generateMetadata({ params }: PageProps<"/careers/[slug]">)
   return career ? { title: career.title, description: career.description } : {};
 }
 
-export default function CareerPage({ params }: PageProps<"/careers/[slug]">) {
-  return <Suspense fallback={<div className="page-shell empty-state">Loading profession guide…</div>}><CareerPageContent params={params} /></Suspense>;
-}
-
-async function CareerPageContent({ params }: Pick<PageProps<"/careers/[slug]">, "params">) {
+export default async function CareerPage({ params }: PageProps<"/careers/[slug]">) {
   const { slug } = await params;
   const career = careerBySlug(slug);
   if (!career) notFound();

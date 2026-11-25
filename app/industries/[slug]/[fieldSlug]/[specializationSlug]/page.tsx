@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CareerCard from "@/components/CareerCard";
@@ -29,11 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return specialization ? { title: specialization.name, description: specialization.overview } : {};
 }
 
-export default function SpecializationPage({ params }: Props) {
-  return <Suspense fallback={<div className="page-shell empty-state">Loading professions…</div>}><SpecializationPageContent params={params} /></Suspense>;
-}
-
-async function SpecializationPageContent({ params }: Pick<Props, "params">) {
+export default async function SpecializationPage({ params }: Props) {
   const { slug, fieldSlug, specializationSlug } = await params;
   const industry = careerTaxonomy.find((item) => item.slug === slug);
   const field = industry?.fields.find((item) => slugify(item.name) === fieldSlug);

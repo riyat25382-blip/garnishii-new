@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { careerTaxonomy } from "@/data/career-taxonomy";
@@ -15,11 +14,7 @@ export async function generateMetadata({ params }: PageProps<"/industries/[slug]
   return industry ? { title: industry.name, description: industry.description } : {};
 }
 
-export default function IndustryPage({ params }: PageProps<"/industries/[slug]">) {
-  return <Suspense fallback={<div className="page-shell empty-state">Loading industry…</div>}><IndustryPageContent params={params} /></Suspense>;
-}
-
-async function IndustryPageContent({ params }: Pick<PageProps<"/industries/[slug]">, "params">) {
+export default async function IndustryPage({ params }: PageProps<"/industries/[slug]">) {
   const { slug } = await params;
   const industry = careerTaxonomy.find((item) => item.slug === slug);
   if (!industry) notFound();
